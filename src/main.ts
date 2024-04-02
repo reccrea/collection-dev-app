@@ -11,7 +11,11 @@ import { setupGlobComponent } from '@/components'
 import { setupPlugins } from '@/plugins'
 import { setupGlobDirectives } from '@/directives'
 
+import { checkUpdate } from '@/utils/updater'
+
 const bootstrap = async () => {
+  checkUpdate()
+
   const app = createApp(App)
 
   setupStore(app)

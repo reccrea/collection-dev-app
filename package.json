@@ -19,7 +19,8 @@
     "lint:prettier": "prettier --write \"src/**/*.{js,ts,json,tsx,css,less,scss,vue,html,md}\"",
     "lint:lint-staged": "lint-staged",
     "prepare": "husky install",
-    "commit": "git add -A && czg"
+    "commit": "git add -A && czg",
+    "test:dev": "npx http-server dist --cors -c-1"
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
@@ -45,6 +46,7 @@
     "czg": "^1.9.1",
     "eslint": "^8.49.0",
     "eslint-plugin-vue": "^9.17.0",
+    "http-server": "^14.1.1",
     "husky": "^9.0.11",
     "less": "^4.2.0",
     "lint-staged": "^15.2.2",
