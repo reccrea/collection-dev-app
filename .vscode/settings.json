@@ -1,0 +1,36 @@
+{
+  // 是否显示缩略图
+  "editor.minimap.enabled": false,
+  // 鼠标滚轮时对编辑器字体大小进行缩放
+  "editor.mouseWheelZoom": true,
+  // 控制每个方括号类型是否具有自己的独立颜色池
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "editor.tabSize": 2,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnType": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+  "editor.suggestSelection": "first",
+  "editor.snippetSuggestions": "top",
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.fontSize": 18,
+
+  "files.eol": "\n",
+  "files.autoSave": "afterDelay",
+  "git.confirmSync": false,
+
+  // 在 VS Code 中重命名或移动文件时自动更新导入路径的功能
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  "javascript.updateImportsOnFileMove.enabled": "always",
+
+  // 资源管理器是否应以紧凑形式呈现文件夹
+  "explorer.compactFolders": false
+}
