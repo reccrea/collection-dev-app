@@ -8,6 +8,7 @@ declare interface ViteEnv {
   VITE_DROP_CONSOLE: boolean
   VITE_PUBLIC_PATH: string
   VITE_DROP_SOURCEMAP: boolean
+  VITE_CDN: boolean
 }
 
 declare type Recordable<T = any> = Record<string, T>
