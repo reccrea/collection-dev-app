@@ -59,9 +59,29 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       rollupOptions: {
         // 静态资源分类打包
         output: {
-          chunkFileNames: 'static/js/[name]-[hash].js',
+          /* chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
-          assetFileNames: 'static/[ext]/[name]-[hash].[ext]'
+          assetFileNames: 'static/[ext]/[name]-[hash].[ext]' */
+          manualChunks(id) {
+            // 文件路径id
+            console.log('id', id)
+
+            const chunkArray = ['vue', 'vue-router']
+
+            if (chunkArray.find((chunk) => id.includes(`node_modules/${chunk}/`))) {
+              return id.toString().split(`node_modules/`)[1].split('/')[0].toString()
+            }
+          },
+
+          chunkFileNames(chunkInfo) {
+            const facadeModuleId = chunkInfo.facadeModuleId
+              ? chunkInfo.facadeModuleId.split('/')
+              : []
+
+            const fileName = facadeModuleId[facadeModuleId.length - 2] || `[name]`
+
+            return `js/${fileName}/name.[hash].js`
+          }
         }
       }
     }
