@@ -11,9 +11,15 @@ export const createCompression = (viteEnv: ViteEnv): PluginOption | PluginOption
   if (compressList.includes('gzip')) {
     plugins.push(
       viteCompression({
+        // 是否在控制台输出压缩结果
+        verbose: true,
+        // 默认false，设置为true禁用压缩
+        disable: false,
         // 生成的压缩包后缀
         ext: '.gz',
-        // 体积大于threshold才会被压缩
+        // 体积大于threshold才会被压缩，单位：字节，默认是0
+        threshold: 10240,
+        // 使用gzip压缩
         algorithm: 'gzip',
         // 默认压缩.js|mjs|json|css|html后缀文件，设置成true，压缩全部文件
         filter: () => true,
