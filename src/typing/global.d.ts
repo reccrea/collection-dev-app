@@ -17,3 +17,5 @@ declare module 'vite-plugin-eslint' {
   const content: any
   export = content
 }
+
+declare module 'fabric-with-erasing'

@@ -1,5 +1,5 @@
 import { paintBoard } from '@/utils/paintBoard'
-import { fabric } from 'fabric'
+import fabric from 'fabric-with-erasing'
 
 import { renderDrawCursor } from './cursor'
 
