@@ -15,6 +15,8 @@ module.exports = {
   rules: {
     'no-debugger': 'off',
 
-    'vue/multi-word-component-names': 'off'
+    'vue/multi-word-component-names': 'off',
+
+    'no-async-promise-executor': 'off'
   }
 }

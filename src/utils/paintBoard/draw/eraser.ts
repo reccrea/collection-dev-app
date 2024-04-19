@@ -1,5 +1,5 @@
 import { paintBoard } from '@/utils/paintBoard'
-import fabric from 'fabric-with-erasing'
+import { fabric } from 'fabric'
 
 // 橡皮擦
 export const renderEraserBrush = (width: number = 5, color: string = '#ffffff') => {

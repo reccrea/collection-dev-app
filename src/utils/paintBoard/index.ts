@@ -1,19 +1,29 @@
-import fabric from 'fabric-with-erasing'
+import { fabric } from 'fabric'
 
 import { CanvasEvent } from './event'
 
+import { History } from './history'
+
 import { renderPencilBrush } from './draw/pencil'
 import { renderEraserBrush } from './draw/eraser'
+import { useBoardStore } from '@/store/modules/board'
+import { useFreeDrawStore } from '@/store/modules/freeDraw'
+import { DrawStyle } from './constant/draw'
+import { ActionMode } from './constant/board'
+import { useFileStore } from '@/store/modules/file'
+import { handleCanvasJSONLoaded } from '@/utils/paintBoard/common/loadCanvas'
 
 class PaintBoard {
   canvas: fabric.Canvas | null = null
   evnt: CanvasEvent | null = null
+  history: History | null = null
+  hookFn: Array<() => void> = []
 
   constructor() {}
 
   // 初始化画板
   initCanvas(canvasEl: HTMLCanvasElement) {
-    return new Promise<boolean>((resolve) => {
+    return new Promise<boolean>(async (resolve) => {
       // defaultCursor：默认光标，即（默认值：default）
       // hoverCursor：鼠标移动到对象上的样式（默认值：move）
       // moveCursor：对象拖动时的鼠标样式（默认值：move）
@@ -22,7 +32,7 @@ class PaintBoard {
 
       this.canvas = new fabric.Canvas(canvasEl, {
         // 画布背景色
-        backgroundColor: 'transparent',
+        // backgroundColor: 'transparent',
 
         // 画布鼠标框选时的背景色
         selectionColor: 'rgba(101, 204, 138, 0.3)',
@@ -53,14 +63,19 @@ class PaintBoard {
         transparentCorners: false
       })
 
+      // 画笔的角落风格
       fabric.Line.prototype.strokeLineJoin = 'round'
+
+      // 线条结尾的画笔风格
       fabric.Line.prototype.strokeLineCap = 'round'
 
       // 初始化事件，比说点击或者缩放事件
       this.evnt = new CanvasEvent()
 
       // 处理画板操作模式
-      this.handleModel()
+      this.onActionMode()
+
+      await this.initCanvasStorage()
 
       resolve(true)
     })
@@ -75,6 +90,34 @@ class PaintBoard {
     }
   }
 
+  initCanvasStorage() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const file = useFileStore().files?.find((item) => item.id == useFileStore().currentId)
+        if (file && this.canvas) {
+          this.canvas.loadFromJSON(file.boardData, () => {
+            if (this.canvas) {
+              useBoardStore().initBackground()
+
+              handleCanvasJSONLoaded(this.canvas)
+
+              fabric.Object.prototype.set({
+                objectCaching: useBoardStore().isObjectCaching
+              })
+
+              this.canvas.renderAll()
+              this.triggerHook()
+              this.history = new History()
+            }
+            resolve(true)
+          })
+        } else {
+          resolve(true)
+        }
+      }, 300)
+    })
+  }
+
   /* 
     操作模式
 
@@ -82,7 +125,7 @@ class PaintBoard {
     橡皮擦 ERASE
     选择 SELECT
   */
-  handleModel(actionModel = 'SELECT') {
+  onActionMode(actionMode = useBoardStore().actionMode) {
     if (!this.canvas) return
 
     let isDrawingMode = false
@@ -93,9 +136,9 @@ class PaintBoard {
       hoverCursor: 'default'
     }
 
-    switch (actionModel) {
+    switch (actionMode) {
       // 绘画
-      case 'DRAW':
+      case ActionMode.DRAW:
         isDrawingMode = true
         selection = false
 
@@ -107,7 +150,7 @@ class PaintBoard {
         break
 
       // 橡皮擦
-      case 'ERASE':
+      case ActionMode.ERASE:
         isDrawingMode = true
         selection = false
 
@@ -118,7 +161,7 @@ class PaintBoard {
         break
 
       // 选择
-      case 'SELECT':
+      case ActionMode.SELECT:
         isDrawingMode = false
         selection = true
 
@@ -141,8 +184,62 @@ class PaintBoard {
   }
 
   handleDrawStyle() {
-    if (!this.canvas) return
-    renderPencilBrush()
+    if (!this.canvas) {
+      return
+    }
+
+    /**
+     * 自由绘画 - 绘画风格
+     * 1.basic 基础
+     * 2.rainbow 彩虹 这里可能用不到
+     */
+    const drawStyle = useFreeDrawStore().drawStyle
+
+    switch (drawStyle) {
+      case DrawStyle.Basic:
+        renderPencilBrush()
+        break
+      default:
+        this.canvas.isDrawingMode = false
+        break
+    }
+  }
+
+  addHookFn(fn: () => void) {
+    this.hookFn.push(fn)
+  }
+
+  removeHookFn(fn: () => void) {
+    const hookIndex = this.hookFn.findIndex((v) => v === fn)
+    if (hookIndex > -1) {
+      this.hookFn.splice(hookIndex, 1)
+    }
+  }
+
+  triggerHook() {
+    this.hookFn.map((fn) => {
+      fn?.()
+    })
+  }
+
+  deleteObject() {
+    if (this.canvas) {
+      const activeObjects = this.canvas.getActiveObjects()
+      if (activeObjects?.length) {
+        this.canvas.discardActiveObject()
+        activeObjects?.forEach((obj) => {
+          this.canvas?.remove(obj)
+        })
+        this.render()
+      }
+    }
+  }
+
+  render() {
+    if (this.canvas) {
+      this.canvas?.requestRenderAll()
+      this.history?.saveState()
+    }
   }
 }
 
