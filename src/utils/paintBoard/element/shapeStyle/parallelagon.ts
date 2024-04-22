@@ -8,6 +8,7 @@ import {
   setObjectAttr
 } from '@/utils/paintBoard/common/draw'
 import { SHAPESTYLE_ELEMENT_CUSTOM_TYPE } from '@/utils/paintBoard/constant/element'
+import { calculateParallelagonPath } from '@/utils/paintBoard/element/shapeStyle/utils'
 
 // 平行四边形
 export class Parallelagon {
@@ -16,31 +17,22 @@ export class Parallelagon {
   startY = 0
 
   constructor(point: fabric.Point | undefined) {
-    if (!point) return
+    if (!point) {
+      return
+    }
 
     this.startX = point.x
     this.startY = point.y
 
     const strokeWidth = getShapeBorderWidth()
 
-    const points = [
-      {
-        x: this.startX,
-        y: this.startY
-      },
-      {
-        x: this.startX + 5,
-        y: this.startY
-      },
-      {
-        x: this.startX + 5 + 5,
-        y: this.startY + 5
-      },
-      {
-        x: this.startX + 5,
-        y: this.startY + 5
-      }
-    ]
+    const points = calculateParallelagonPath(
+      this.startX,
+      this.startY,
+      this.startX + 10,
+      this.startY + 10
+    )
+
     const shape = new fabric.Polygon(points, {
       stroke: useShapeDrawStore().borderColor,
       strokeWidth,
@@ -67,24 +59,7 @@ export class Parallelagon {
 
     const { x: moveToX, y: moveToY } = new fabric.Point(point.x, point.y)
 
-    const newPoints = [
-      {
-        x: this.startX,
-        y: this.startY
-      },
-      {
-        x: moveToX,
-        y: this.startY
-      },
-      {
-        x: moveToX + 50,
-        y: moveToY
-      },
-      {
-        x: this.startX + 50,
-        y: moveToY
-      }
-    ]
+    const newPoints = calculateParallelagonPath(this.startX, this.startY, moveToX, moveToY)
 
     // @ts-expect-error
     this.shapeInstance.points = newPoints
