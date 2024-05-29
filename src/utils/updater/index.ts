@@ -78,10 +78,10 @@ export const checkUpdate = () => {
   })
   //未更新通知
   updateInstance.on('no-update', () => {
-    console.log('update no-----')
+    console.log('file-update no-----')
   })
   //更新通知
   updateInstance.on('update', () => {
-    console.log('update yes-----')
+    console.log('file-update yes-----')
   })
 }
